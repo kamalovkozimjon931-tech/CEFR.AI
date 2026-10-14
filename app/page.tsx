@@ -83,13 +83,11 @@ export default function HomePage() {
   function chooseNav(label: string) {
     setActiveNav(label);
     setMobileNav(false);
-    if (label !== "Bosh sahifa") {
-      setNotice(label === "AI ustoz"
-        ? "AI ustoz bo‘limi keyingi bosqichda AI xizmatiga ulanadi."
-        : `“${label}” bo‘limi uchun poydevor tayyor. Keyingi bosqichda funksiyalar qo‘shiladi.`);
-    } else setNotice("");
+    setNotice("");
+    if (label === "Bosh sahifa") { setSectionOpen(""); return; }
+    if (label === "Mock testlar") { setSectionOpen(""); beginQuiz(); return; }
+    setSectionOpen(label);
   }
-
   return (
     <main className="app-shell">
       <aside className={`sidebar ${mobileNav ? "sidebar-open" : ""}`}>
