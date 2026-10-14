@@ -43,6 +43,12 @@ export default function HomePage() {
   const [tutorQuestion, setTutorQuestion] = useState("");
   const [tutorAnswer, setTutorAnswer] = useState("");
   const [studySkill, setStudySkill] = useState("Reading");
+  const [authMode, setAuthMode] = useState<"register" | "login">("register");
+  const [authenticated, setAuthenticated] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authMessage, setAuthMessage] = useState("");
 
   const vocabulary = [
     { word: "Achieve", meaning: "erishmoq, amalga oshirmoq", example: "You can achieve your goals with practice." },
@@ -88,6 +94,35 @@ export default function HomePage() {
     if (label === "Mock testlar") { setSectionOpen(""); beginQuiz(); return; }
     setSectionOpen(label);
   }
+  if (!authenticated) {
+    return (
+      <main className="auth-page">
+        <section className="auth-visual">
+          <div className="auth-brand"><span className="auth-brand-icon"><AudioLines size={24} /></span> CEFR<span>.</span>AI</div>
+          <div className="auth-visual-copy"><span className="auth-kicker"><Sparkles size={15} /> INGLIZ TILINI YANGI BOSQICHDA</span><h1>Kelajagingizga<br />bugun <span>qadam qo‘ying.</span></h1><p>CEFR imtihoniga tayyorlaning, bilimlaringizni mustahkamlang va maqsadingizga ishonch bilan boring.</p><div className="auth-feature"><span><Check size={17} /></span> Reading, Listening, Writing va Speaking</div><div className="auth-feature"><span><Check size={17} /></span> Shaxsiy o‘quv reja va mini testlar</div><div className="auth-feature"><span><Check size={17} /></span> Har kuni yangi so‘zlar va mashqlar</div></div>
+          <div className="auth-visual-footer">Bilim sari har kuni bir qadam. <span>CEFR.AI © 2026</span></div>
+          <div className="auth-decoration auth-decoration-one" /><div className="auth-decoration auth-decoration-two" />
+        </section>
+        <section className="auth-form-side"><div className="auth-form-wrap">
+          <div className="auth-mobile-brand"><AudioLines size={22} /> CEFR<span>.</span>AI</div>
+          <div className="auth-welcome">{authMode === "register" ? "Xush kelibsiz!" : "Yana ko‘rishganimizdan xursandmiz!"}</div>
+          <h2>{authMode === "register" ? "Akkaunt yarating" : "Akkauntingizga kiring"}</h2>
+          <p className="auth-subtitle">{authMode === "register" ? "Boshlash uchun ma’lumotlaringizni kiriting." : "Davom etish uchun email va parolingizni kiriting."}</p>
+          <div className="auth-tabs"><button className={authMode === "register" ? "auth-tab active" : "auth-tab"} onClick={() => {setAuthMode("register");setAuthMessage("");}}>Ro‘yxatdan o‘tish</button><button className={authMode === "login" ? "auth-tab active" : "auth-tab"} onClick={() => {setAuthMode("login");setAuthMessage("");}}>Kirish</button></div>
+          <form className="auth-form" onSubmit={(e) => {e.preventDefault();setAuthenticated(true);setAuthMessage("");}}>
+            {authMode === "register" && <label>Ism va familiya<input required autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ismingizni kiriting" /></label>}
+            <label>Email manzil<input required type="email" autoComplete="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)} placeholder="siz@example.com" /></label>
+            <label>Parol<input required minLength={6} type="password" autoComplete={authMode === "register" ? "new-password" : "current-password"} value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} placeholder="Kamida 6 ta belgi" /></label>
+            {authMode === "register" && <label className="auth-terms"><input type="checkbox" required /> <span>Foydalanish shartlari va maxfiylik siyosatiga roziman.</span></label>}
+            {authMessage && <p className="auth-message">{authMessage}</p>}
+            <button className="auth-submit" type="submit">{authMode === "register" ? "Bepul akkaunt yaratish" : "Kirish"} <ArrowRight size={17} /></button>
+          </form>
+          <p className="auth-demo-note"><CircleHelp size={15} /> Hozircha bu sahifa demo ko‘rinishida. Haqiqiy akkauntlar uchun autentifikatsiya xizmati ulanishi kerak.</p>
+        </div><div className="auth-bottom-note">Xavfsiz o‘rganish muhiti · CEFR.AI</div></section>
+      </main>
+    );
+  }
+
   return (
     <main className="app-shell">
       <aside className={`sidebar ${mobileNav ? "sidebar-open" : ""}`}>
