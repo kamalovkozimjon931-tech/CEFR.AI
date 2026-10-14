@@ -37,6 +37,24 @@ export default function HomePage() {
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [mobileNav, setMobileNav] = useState(false);
   const [notice, setNotice] = useState("");
+  const [sectionOpen, setSectionOpen] = useState("");
+  const [wordIndex, setWordIndex] = useState(0);
+  const [wordSearch, setWordSearch] = useState("");
+  const [tutorQuestion, setTutorQuestion] = useState("");
+  const [tutorAnswer, setTutorAnswer] = useState("");
+  const [studySkill, setStudySkill] = useState("Reading");
+
+  const vocabulary = [
+    { word: "Achieve", meaning: "erishmoq, amalga oshirmoq", example: "You can achieve your goals with practice." },
+    { word: "Improve", meaning: "yaxshilamoq, rivojlantirmoq", example: "I want to improve my English." },
+    { word: "Essential", meaning: "juda muhim, zarur", example: "Practice is essential for progress." },
+    { word: "Opportunity", meaning: "imkoniyat", example: "This course is a great opportunity." },
+    { word: "Confident", meaning: "o‘ziga ishongan", example: "She feels confident when speaking English." },
+    { word: "Environment", meaning: "atrof-muhit, sharoit", example: "A good learning environment helps." },
+    { word: "Develop", meaning: "rivojlantirmoq", example: "Reading helps develop vocabulary." },
+    { word: "Challenge", meaning: "qiyinchilik, sinov", example: "Every challenge is a chance to learn." },
+  ];
+  const filteredVocabulary = vocabulary.filter((item) => (item.word + " " + item.meaning).toLowerCase().includes(wordSearch.toLowerCase()));
 
   const current = questions[questionIndex];
   const score = answers.filter(Boolean).length;
@@ -128,7 +146,7 @@ export default function HomePage() {
 
           <section className="section-block">
             <div className="section-heading"><div><h2>Bugungi mashg‘ulotlar</h2><p>Ko‘nikmalaringizni birma-bir rivojlantiring.</p></div><button className="text-link" onClick={() => chooseNav("O‘rganish")}>Barchasini ko‘r <ArrowRight size={16} /></button></div>
-            <div className="tasks-grid">{tasks.map(({ title, detail, icon: Icon, tone, time }) => <button className="task-card" key={title} onClick={() => { setNotice(`${title}: ${time}. Ushbu modul keyingi bosqichda to‘liq ishlab chiqiladi.`); setActiveNav("O‘rganish"); }}><div className={`task-icon ${tone}`}><Icon size={21} /></div><div className="task-copy"><strong>{title}</strong><span>{detail}</span></div><span className="task-time"><Clock3 size={13} /> {time}</span><span className="task-arrow"><ArrowRight size={17} /></span></button>)}</div>
+            <div className="tasks-grid">{tasks.map(({ title, detail, icon: Icon, tone, time }) => <button className="task-card" key={title} onClick={() => { setStudySkill(title.split(" ")[0]); setActiveNav("O‘rganish"); setSectionOpen("O‘rganish"); }}><div className={`task-icon ${tone}`}><Icon size={21} /></div><div className="task-copy"><strong>{title}</strong><span>{detail}</span></div><span className="task-time"><Clock3 size={13} /> {time}</span><span className="task-arrow"><ArrowRight size={17} /></span></button>)}</div>
           </section>
 
           <section className="bottom-grid">
@@ -139,6 +157,14 @@ export default function HomePage() {
         </div>
       </section>
 
+      {sectionOpen && <div className="modal-backdrop" role="presentation" onClick={() => setSectionOpen("")}>
+        <section className="quiz-modal section-modal" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
+          <div className="quiz-top"><span className="quiz-mark">{sectionOpen === "Lug‘at" ? <NotebookPen size={20} /> : sectionOpen === "AI ustoz" ? <Sparkles size={20} /> : <BookOpen size={20} />}</span><button className="icon-button" onClick={() => setSectionOpen("")} aria-label="Bo‘limni yopish"><X size={20} /></button></div>
+          {sectionOpen === "O‘rganish" && <><div className="quiz-progress-label"><span>O‘RGANISH MARKAZI</span><strong>4 ko‘nikma</strong></div><h2>{studySkill} mashqi</h2><p className="quiz-hint">Bugun qaysi ko‘nikmani rivojlantirmoqchisiz?</p><div className="section-skill-grid">{["Reading","Listening","Writing","Speaking"].map((skill) => <button className={studySkill === skill ? "section-skill selected" : "section-skill"} key={skill} onClick={() => setStudySkill(skill)}><strong>{skill}</strong><span>{skill === "Reading" ? "Matnni o‘qib tushunish" : skill === "Listening" ? "Audio orqali tushunish" : skill === "Writing" ? "Yozma fikr bildirish" : "Og‘zaki nutq"}</span></button>)}</div><div className="section-info"><strong>{studySkill} uchun topshiriq</strong><p>{studySkill === "Reading" ? "Read a short English text and identify its main idea. Keyin mini testni bajarib ko‘ring." : studySkill === "Listening" ? "Inglizcha qisqa audio tinglang, asosiy fikr va kalit so‘zlarni yozib oling. Audio mashqlari keyingi yangilanishda ulanadi." : studySkill === "Writing" ? "Write 5–7 sentences about your daily routine. Tekshirish uchun AI ustoz bo‘limidan foydalanishingiz mumkin." : "Describe your day in English for one minute. Ovoz yozish funksiyasi keyingi yangilanishda qo‘shiladi."}</p></div><button className="primary-button quiz-submit" onClick={() => { setSectionOpen(""); beginQuiz(); }}>Mashqni boshlash <ArrowRight size={17} /></button></>}
+          {sectionOpen === "Lug‘at" && <><div className="quiz-progress-label"><span>SO‘Z BOYLIGI</span><strong>{wordIndex + 1}/{vocabulary.length}</strong></div><h2>Yangi so‘zlarni o‘rganing</h2><input className="vocab-search" value={wordSearch} onChange={(e) => setWordSearch(e.target.value)} placeholder="So‘z yoki tarjima qidirish..." /><div className="vocab-card"><span className="vocab-tag">CEFR VOCABULARY</span><h3>{filteredVocabulary.length ? filteredVocabulary[wordIndex % filteredVocabulary.length].word : "So‘z topilmadi"}</h3><p>{filteredVocabulary.length ? filteredVocabulary[wordIndex % filteredVocabulary.length].meaning : "Boshqa so‘z bilan qidirib ko‘ring."}</p>{filteredVocabulary.length > 0 && <em>{filteredVocabulary[wordIndex % filteredVocabulary.length].example}</em>}</div><div className="vocab-actions"><button className="secondary-button" onClick={() => setWordIndex((wordIndex + filteredVocabulary.length - 1) % Math.max(filteredVocabulary.length,1))}>Oldingi</button><button className="primary-button" onClick={() => setWordIndex((wordIndex + 1) % Math.max(filteredVocabulary.length,1))}>Keyingi so‘z <ArrowRight size={16} /></button></div></>}
+          {sectionOpen === "AI ustoz" && <><div className="quiz-progress-label"><span>SHAXSIY YORDAMCHI</span><strong>Demo rejim</strong></div><h2>Ingliz tili haqida so‘rang</h2><p className="quiz-hint">Savolingizni yozing. Hozircha demo yordamchi; haqiqiy AI ulanishi uchun API sozlamasi kerak bo‘ladi.</p><textarea className="tutor-input" value={tutorQuestion} onChange={(e) => setTutorQuestion(e.target.value)} placeholder="Masalan: Present Perfect va Past Simple farqi nima?" rows={4} /><button className="primary-button quiz-submit" disabled={!tutorQuestion.trim()} onClick={() => setTutorAnswer("Savolingiz: “" + tutorQuestion.trim() + "”\n\nO‘rganish maslahati: savoldagi grammatik qoidani misollar bilan ko‘rib chiqing. Inglizcha 3 ta o‘z misolingizni yozing va ularni tekshirib chiqing.\n\nEslatma: bu hozircha avtomatik demo javob, hali haqiqiy AI modeli ulanmagan.")}>Javob olish <Sparkles size={16} /></button>{tutorAnswer && <div className="section-info tutor-answer"><strong>Ustoz javobi</strong><p>{tutorAnswer}</p></div>}</>}
+        </section>
+      </div>}
       {quizOpen && <div className="modal-backdrop" role="presentation"><section className="quiz-modal" role="dialog" aria-modal="true" aria-labelledby="quiz-title"><div className="quiz-top"><span className="quiz-mark"><Brain size={20} /></span><button className="icon-button" onClick={() => setQuizOpen(false)} aria-label="Testni yopish"><X size={20} /></button></div><div className="quiz-progress-label"><span>MINI TEST · INGLIZ TILI</span><strong>{questionIndex + 1}/{questions.length}</strong></div><div className="quiz-track"><span style={{width:`${((questionIndex + 1) / questions.length) * 100}%`}} /></div><h2 id="quiz-title">{current.q}</h2><p className="quiz-hint">Eng to‘g‘ri javobni tanlang.</p><div className="answer-list">{current.options.map((option, index) => <button key={option} onClick={() => setSelected(index)} className={`answer-option ${selected === index ? "answer-selected" : ""}`}><span className="answer-letter">{String.fromCharCode(65 + index)}</span><span>{option}</span>{selected === index && <Check size={17} />}</button>)}</div><button className="primary-button quiz-submit" disabled={selected === null} onClick={nextQuestion}>{questionIndex === questions.length - 1 ? "Natijani ko‘rish" : "Keyingi savol"} <ArrowRight size={17} /></button><p className="quiz-foot">Bu boshlang‘ich demo test. Natijalar hozircha sessiya davomida saqlanadi.</p></section></div>}
     </main>
   );
